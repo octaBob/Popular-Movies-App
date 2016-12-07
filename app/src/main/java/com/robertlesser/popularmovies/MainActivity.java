@@ -22,7 +22,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        gridView = (GridView) findViewById(R.id.gridView1);
+        gridView = (GridView) findViewById(R.id.movies_main);
 
         gridView.setAdapter(new ImageAdapter(this, MOBILE_OS));
 
