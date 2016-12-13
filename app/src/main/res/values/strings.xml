@@ -5,5 +5,5 @@
     <string name="action_settings">Settings</string>
 
     <!-- Refresh -->
-    <string name="action_refresh">Refresh</string>
+    <string name="action_refresh" translatable="false">Refresh</string>
 </resources>

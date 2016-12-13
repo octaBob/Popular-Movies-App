@@ -6,6 +6,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -52,6 +55,32 @@ public class PopularMoviesFragment extends Fragment {
     };
 
     public PopularMoviesFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.popular_movies_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == R.id.action_refresh){
+            FetchPopularMoviesTask fetchMoviesTask = new FetchPopularMoviesTask();
+            fetchMoviesTask.execute();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -131,6 +160,7 @@ public class PopularMoviesFragment extends Fragment {
                     return null;
                 }
                 movieJsonStr = buffer.toString();
+                Log.v(LOG_TAG, movieJsonStr);
             } catch (IOException e) {
                 Log.e("MovieFragment", "Error ", e);
                 // If the code didn't successfully get the movies data, there's no point in attempting
