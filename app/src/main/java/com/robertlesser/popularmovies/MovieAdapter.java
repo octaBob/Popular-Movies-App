@@ -43,18 +43,18 @@ public class MovieAdapter extends ArrayAdapter<MovieDetails>  {
         // Gets the AndroidFlavor object from the ArrayAdapter at the appropriate position
         MovieDetails movieDetails = getItem(position);
 
-        String imagePath = "https://image.tmdb.org/t/p/w500/gri0DDxsERr6B2sOR1fGLxLpSLx.jpg";
+        String imagePath = "https://image.tmdb.org/t/p/w500" + movieDetails.poster_path;
 
         // Adapters recycle views to AdapterViews.
         // If this is a new View object we're getting, then inflate the layout.
         // If not, this view already has the layout inflated from a previous call to getView,
         // and we modify the View widgets as usual.
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.movie_grid_image, parent, false);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.movie_grid_image, parent, false);
         }
 
         ImageView iconView = (ImageView) convertView.findViewById(R.id.grid_item_image);
-        Picasso.with(getContext()).load(imagePath).into(iconView);
+        Picasso.with(mContext).load(imagePath).into(iconView);
 
 
         return iconView;

@@ -19,6 +19,11 @@ android {
     }
     productFlavors {
     }
+
+    buildTypes.each {
+        it.buildConfigField 'String', 'TMDB_API_KEY', MyTmdbApiKey
+    }
+
 }
 
 dependencies {

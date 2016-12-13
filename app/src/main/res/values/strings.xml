@@ -3,4 +3,7 @@
 
     <!--Settings-->
     <string name="action_settings">Settings</string>
+
+    <!-- Refresh -->
+    <string name="action_refresh">Refresh</string>
 </resources>
