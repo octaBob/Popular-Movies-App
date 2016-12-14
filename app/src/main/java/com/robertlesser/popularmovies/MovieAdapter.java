@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Robert on 07/12/2016.
@@ -20,7 +20,7 @@ public class MovieAdapter extends ArrayAdapter<MovieDetails>  {
 
     private Context mContext;
 
-    public MovieAdapter(Activity context, List<MovieDetails> movieDetailsList) {
+    public MovieAdapter(Activity context, ArrayList<MovieDetails> movieDetailsList) {
         // Here, we initialize the ArrayAdapter's internal storage for the context and the list.
         // the second argument is used when the ArrayAdapter is populating a single TextView.
         // Because this is a custom adapter for two TextViews and an ImageView, the adapter is not
@@ -43,7 +43,7 @@ public class MovieAdapter extends ArrayAdapter<MovieDetails>  {
         // Gets the AndroidFlavor object from the ArrayAdapter at the appropriate position
         MovieDetails movieDetails = getItem(position);
 
-        String imagePath = "https://image.tmdb.org/t/p/w500" + movieDetails.poster_path;
+        String imagePath = movieDetails.getPosterPath();
 
         // Adapters recycle views to AdapterViews.
         // If this is a new View object we're getting, then inflate the layout.
@@ -59,6 +59,5 @@ public class MovieAdapter extends ArrayAdapter<MovieDetails>  {
 
         return iconView;
     }
-
 
 }

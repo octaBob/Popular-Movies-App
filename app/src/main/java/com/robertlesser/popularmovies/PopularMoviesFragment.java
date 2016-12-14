@@ -13,14 +13,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Vector;
 
 /**
  * Created by Robert on 07/12/2016.
@@ -41,17 +46,17 @@ public class PopularMoviesFragment extends Fragment {
 
     MovieDetails[] movies = {
             new MovieDetails(259316, "Fantastic Beasts and Where to Find Them",
-                    "/nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", false, info, 7, new Date(2016-11-16)),
+                    "http://image.tmdb.org/t/p/w185//nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", info, 7, "2016-11-16"),
             new MovieDetails(259316, "Fantastic Beasts and Where to Find Them",
-                    "/nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", false, info, 7, new Date(2016-11-16)),
+                    "http://image.tmdb.org/t/p/w185//nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", info, 7, "2016-11-16"),
             new MovieDetails(259316, "Fantastic Beasts and Where to Find Them",
-                    "/nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", false, info, 7, new Date(2016-11-16)),
+                    "http://image.tmdb.org/t/p/w185//nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", info, 7, "2016-11-16"),
             new MovieDetails(259316, "Fantastic Beasts and Where to Find Them",
-                    "/nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", false, info, 7, new Date(2016-11-16)),
+                    "http://image.tmdb.org/t/p/w185//nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", info, 7, "2016-11-16"),
             new MovieDetails(259316, "Fantastic Beasts and Where to Find Them",
-                    "/nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", false, info, 7, new Date(2016-11-16)),
+                    "http://image.tmdb.org/t/p/w185//nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", info, 7, "2016-11-16"),
             new MovieDetails(259316, "Fantastic Beasts and Where to Find Them",
-                    "/nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", false, info, 7, new Date(2016-11-16))
+                    "http://image.tmdb.org/t/p/w185//nHXiMnWUAUba2LZ0dFkNDVdvJ1o.jpg", info, 7, "2016-11-16")
     };
 
     public PopularMoviesFragment() {
@@ -75,9 +80,9 @@ public class PopularMoviesFragment extends Fragment {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_refresh){
+        if (id == R.id.action_sort_by_popularity){
             FetchPopularMoviesTask fetchMoviesTask = new FetchPopularMoviesTask();
-            fetchMoviesTask.execute();
+            fetchMoviesTask.execute("popular");
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -87,8 +92,8 @@ public class PopularMoviesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.pupular_movies_fragment, container, false);
-
-        movieAdapter = new MovieAdapter(getActivity(), Arrays.asList(movies));
+        ArrayList<MovieDetails> movieDetailsArrayList = new ArrayList<MovieDetails>(Arrays.asList(movies));
+        movieAdapter = new MovieAdapter(getActivity(), movieDetailsArrayList);
 
         // Get a reference to the GridView, and attach this adapter to it.
         GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
@@ -99,12 +104,16 @@ public class PopularMoviesFragment extends Fragment {
     }
 
 
-    public class FetchPopularMoviesTask extends AsyncTask<Void, Void, Void>{
+    public class FetchPopularMoviesTask extends AsyncTask<String, Void, Vector<MovieDetails>> {
 
         private final String LOG_TAG = FetchPopularMoviesTask.class.getSimpleName();
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Vector<MovieDetails> doInBackground(String... params) {
+
+            if (params.length == 0){
+                return null;
+            }
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -120,7 +129,9 @@ public class PopularMoviesFragment extends Fragment {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at TMDB's API page, at
                 // http://openweathermap.org/API#forecast
-                final String TMDB_BASE_URL = "https://api.themoviedb.org/3/movie/popular?";
+                final String TMDB_BASE_URL = "https://api.themoviedb.org/3/movie/" +
+                        params[0] +
+                        "?";
                 final String API_PARAM = "api_key";
                 final String LANGUAGE_PARAM = "language";
                 final String PAGE_PARAM = "page";
@@ -160,6 +171,7 @@ public class PopularMoviesFragment extends Fragment {
                     return null;
                 }
                 movieJsonStr = buffer.toString();
+
                 Log.v(LOG_TAG, movieJsonStr);
             } catch (IOException e) {
                 Log.e("MovieFragment", "Error ", e);
@@ -174,11 +186,75 @@ public class PopularMoviesFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e("MovieFragment", "Error closing stream", e);
+                        Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
             }
 
+            return getMovieDataFromJson(movieJsonStr);
+        }
+
+        @Override
+        protected void onPostExecute(Vector<MovieDetails> movieDetailsVector) {
+            if (movieDetailsVector != null){
+                movieAdapter.clear();
+                movieAdapter.addAll(movieDetailsVector);
+            }
+        }
+
+        private Vector<MovieDetails> getMovieDataFromJson(String movieJsonStr) {
+
+            // Movie details
+            final String OWM_ID = "id";
+            final String OWM_TITLE = "original_title";
+            final String OWM_POSTER = "poster_path";
+            final String OWM_OVERVIEW = "overview";
+            final String OWM_USER_RATING = "vote_average";
+            final String OWM_RELEASE_DATE = "release_date";
+
+            final String OWM_RESULTS = "results";
+
+
+            try{
+                JSONObject moviesJson = new JSONObject(movieJsonStr);
+                JSONArray resultsArray = moviesJson.getJSONArray(OWM_RESULTS);
+
+                // Insert the new weather information into the database
+                Vector<MovieDetails> cVVector = new Vector<>(resultsArray.length());
+
+                for (int i = 0; i <resultsArray.length(); i++){
+                    JSONObject movieInfo = resultsArray.getJSONObject(i);
+                    int id = movieInfo.getInt(OWM_ID);
+                    String original_title = movieInfo.getString(OWM_TITLE);
+                    String poster_path = "http://image.tmdb.org/t/p/w185/" +
+                            movieInfo.getString(OWM_POSTER);
+                    String overview = movieInfo.getString(OWM_OVERVIEW);
+                    double vote_average = movieInfo.getDouble(OWM_USER_RATING);
+                    String release_date = movieInfo.getString(OWM_RELEASE_DATE);
+
+//                    ContentValues movieDetails = new ContentValues();
+//                    movieDetails.put("id", id);
+//                    movieDetails.put("title", original_title);
+//                    movieDetails.put("poster_path", poster_path);
+//                    movieDetails.put("overview", overview);
+//                    movieDetails.put("user_rating", vote_average);
+//                    movieDetails.put("release_date", release_date);
+
+//                    cVVector.add(movieDetails);
+
+                    // TODO: eventually this will be handled using contentValues
+                    MovieDetails movie = new MovieDetails(id, original_title,
+                            poster_path, overview, vote_average, release_date);
+                    cVVector.add(movie);
+
+                }
+
+                return cVVector;
+
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
             return null;
         }
     };
