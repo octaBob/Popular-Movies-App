@@ -9,5 +9,6 @@
     <string name="menu_sort_by">Sort By...</string>
     <string name="action_sort_by_popularity" translatable="false">Popularity</string>
     <string name="action_sort_by_rating">User Rating</string>
+    <string name="title_activity_movie_details">MovieDetailsActivity</string>
 
 </resources>
