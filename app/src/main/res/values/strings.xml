@@ -4,6 +4,10 @@
     <!--Settings-->
     <string name="action_settings">Settings</string>
 
-    <!-- Refresh -->
-    <string name="action_sort_by_popularity" translatable="false">Sort By Popularity</string>
+
+    <!-- Sort By -->
+    <string name="menu_sort_by">Sort By...</string>
+    <string name="action_sort_by_popularity" translatable="false">Popularity</string>
+    <string name="action_sort_by_rating">User Rating</string>
+
 </resources>

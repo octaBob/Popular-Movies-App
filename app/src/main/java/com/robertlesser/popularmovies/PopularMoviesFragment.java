@@ -11,7 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +44,9 @@ public class PopularMoviesFragment extends Fragment {
             "and threatens to strain even further the state of magical and non-magical relations.";
 
 
-    private MovieAdapter movieAdapter;
+    private MovieAdapter mMovieAdapter;
+    private GridView mGridView;
+    private int mPosition = GridView.INVALID_POSITION;
 
     MovieDetails[] movies = {
             new MovieDetails(259316, "Fantastic Beasts and Where to Find Them",
@@ -85,6 +89,11 @@ public class PopularMoviesFragment extends Fragment {
             fetchMoviesTask.execute("popular");
             return true;
         }
+        if (id == R.id.action_sort_by_user_rating){
+            FetchPopularMoviesTask fetchMoviesTask = new FetchPopularMoviesTask();
+            fetchMoviesTask.execute("top_rated");
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -93,11 +102,25 @@ public class PopularMoviesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.pupular_movies_fragment, container, false);
         ArrayList<MovieDetails> movieDetailsArrayList = new ArrayList<MovieDetails>(Arrays.asList(movies));
-        movieAdapter = new MovieAdapter(getActivity(), movieDetailsArrayList);
+        mMovieAdapter = new MovieAdapter(getActivity(), movieDetailsArrayList);
 
         // Get a reference to the GridView, and attach this adapter to it.
-        GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
-        gridView.setAdapter(movieAdapter);
+        mGridView = (GridView) rootView.findViewById(R.id.movies_grid);
+        mGridView.setAdapter(mMovieAdapter);
+
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                MovieDetails selectedMovie = (MovieDetails) adapterView.getItemAtPosition(position);
+                if (selectedMovie != null) {
+                    String movieTitle = selectedMovie.getTitle();
+                    Toast.makeText(getActivity(), movieTitle, Toast.LENGTH_SHORT).show();
+                }
+                mPosition = position;
+            }
+        });
 
         return rootView;
 
@@ -197,8 +220,8 @@ public class PopularMoviesFragment extends Fragment {
         @Override
         protected void onPostExecute(Vector<MovieDetails> movieDetailsVector) {
             if (movieDetailsVector != null){
-                movieAdapter.clear();
-                movieAdapter.addAll(movieDetailsVector);
+                mMovieAdapter.clear();
+                mMovieAdapter.addAll(movieDetailsVector);
             }
         }
 

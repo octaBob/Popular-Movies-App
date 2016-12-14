@@ -8,13 +8,12 @@ package com.robertlesser.popularmovies;
  * Created by poornima-udacity on 6/26/15.
  */
 public class MovieDetails {
-    int id;
-    String title;
-    String poster_path;
-    boolean adult;
-    String plot_synopsis;
-    double user_rating;
-    String release_date;
+    private int id;
+    private String title;
+    private String poster_path;
+    private String plot_synopsis;
+    private double user_rating;
+    private String release_date;
 
     /***
      *
@@ -40,5 +39,9 @@ public class MovieDetails {
 
     public String getPosterPath() {
         return this.poster_path;
+    }
+
+    public String getTitle(){
+        return this.title;
     }
 }
